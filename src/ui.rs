@@ -25,12 +25,13 @@ impl Widget for &App {
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
 
-        let counter_text = Text::from(vec![Line::from(vec![
-            "Value: ".into(),
-            self.counter.to_string().yellow(),
+        let cpu = self.sysmon.cpu_info().usage_percent;
+        let cpu_usage_text = Text::from(vec![Line::from(vec![
+            "CPU usage: ".into(),
+            format!("{:.2}%", cpu).yellow(),
         ])]);
 
-        Paragraph::new(counter_text)
+        Paragraph::new(cpu_usage_text)
             .centered()
             .block(block)
             .render(area, buf);

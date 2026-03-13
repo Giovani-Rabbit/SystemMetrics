@@ -25,7 +25,7 @@ impl Widget for &App {
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
 
-        let cpu = &self.sysmon.lock().unwrap().cpu_info().usage_percent;
+        let cpu = &self.sysmon.cpu_info().usage_percent;
         let cpu_usage_text = Text::from(vec![Line::from(vec![
             "CPU usage: ".into(),
             format!("{:.2}%", cpu).yellow(),

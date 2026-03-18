@@ -4,9 +4,13 @@ pub struct CpuInfo {
 }
 
 pub struct MemoryInfo {
-    pub total_mb: u64,
-    pub used_mb: u64,
-    pub available_mb: u64,
+    pub total: u64,
+    pub used: u64,
+    pub available: u64,
+
+    pub total_swap: u64,
+    pub used_swap: u64,
+    pub free_swap: u64,
 }
 
 pub trait SystemMonitor {

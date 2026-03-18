@@ -24,9 +24,13 @@ impl SystemMonitor for SysinfoMetrics {
 
     fn memory_info(&self) -> super::traits::MemoryInfo {
         MemoryInfo {
-            available_mb: bytes_to_mb(self.sys.available_memory()),
-            total_mb: self.sys.total_memory(),
-            used_mb: self.sys.used_memory(),
+            available: bytes_to_mb(self.sys.available_memory()),
+            total: self.sys.total_memory(),
+            used: self.sys.used_memory(),
+
+            total_swap: self.sys.total_swap(),
+            used_swap: self.sys.used_swap(),
+            free_swap: self.sys.free_swap(),
         }
     }
 

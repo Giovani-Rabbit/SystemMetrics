@@ -11,7 +11,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(sysmon: Box<dyn SystemMonitor + Send>) -> Self {
+    pub fn new(sysmon: Box<dyn SystemMonitor>) -> Self {
         Self {
             sysmon,
             exit: false,

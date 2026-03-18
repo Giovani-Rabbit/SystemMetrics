@@ -7,19 +7,25 @@ use crate::system::traits::SystemMonitor;
 
 pub struct App {
     pub sysmon: Box<dyn SystemMonitor>,
-    exit: bool,
+    mode: Mode,
+}
+
+#[derive(Debug, PartialEq)]
+enum Mode {
+    Running,
+    Quit,
 }
 
 impl App {
     pub fn new(sysmon: Box<dyn SystemMonitor>) -> Self {
         Self {
             sysmon,
-            exit: false,
+            mode: Mode::Running,
         }
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
-        while !self.exit {
+        while self.is_running() {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
             self.sysmon.refresh();
@@ -52,6 +58,10 @@ impl App {
     }
 
     fn exit(&mut self) {
-        self.exit = true;
+        self.mode = Mode::Quit;
+    }
+
+    fn is_running(&self) -> bool {
+        self.mode != Mode::Quit
     }
 }

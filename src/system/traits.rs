@@ -1,6 +1,11 @@
 pub struct CpuInfo {
     pub usage_percent: f32,
-    pub core_amount: usize,
+    pub cores: Vec<CpuCore>,
+}
+
+pub struct CpuCore {
+    pub usage: f32,
+    pub frequency: u64,
 }
 
 pub struct MemoryInfo {

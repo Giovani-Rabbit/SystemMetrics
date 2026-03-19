@@ -1,6 +1,6 @@
 use sysinfo::System;
 
-use crate::system::traits::{CpuInfo, MemoryInfo, SystemMonitor};
+use crate::system::traits::{CpuCore, CpuInfo, MemoryInfo, SystemMonitor};
 
 pub struct SysinfoMetrics {
     sys: System,
@@ -16,9 +16,19 @@ impl SysinfoMetrics {
 
 impl SystemMonitor for SysinfoMetrics {
     fn cpu_info(&self) -> super::traits::CpuInfo {
+        let cores = self
+            .sys
+            .cpus()
+            .iter()
+            .map(|c| CpuCore {
+                usage: c.cpu_usage(),
+                frequency: c.frequency(),
+            })
+            .collect();
+
         CpuInfo {
-            core_amount: self.sys.cpus().len(),
             usage_percent: self.sys.global_cpu_usage(),
+            cores,
         }
     }
 

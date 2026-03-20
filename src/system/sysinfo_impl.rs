@@ -53,3 +53,7 @@ impl SystemMonitor for SysinfoMetrics {
 fn bytes_to_mb(b: u64) -> u64 {
     b / 1024 / 1024
 }
+
+pub fn bytes_to_g(b: u64) -> u64 {
+    b / 1024 / 1024 / 1024
+}

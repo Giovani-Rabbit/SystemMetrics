@@ -1,9 +1,10 @@
 use std::{io, time::Duration};
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, read};
-use ratatui::{DefaultTerminal, Frame};
+use ratatui::DefaultTerminal;
 
 use crate::system::traits::SystemMonitor;
+use crate::ui;
 
 pub struct App {
     pub sysmon: Box<dyn SystemMonitor>,
@@ -26,16 +27,12 @@ impl App {
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while self.is_running() {
-            terminal.draw(|frame| self.draw(frame))?;
+            terminal.draw(|frame| ui::render(frame, &self.sysmon))?;
             self.handle_events()?;
             self.sysmon.refresh();
         }
 
         Ok(())
-    }
-
-    fn draw(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.area());
     }
 
     fn handle_events(&mut self) -> io::Result<()> {

@@ -1,4 +1,5 @@
 pub struct CpuInfo {
+    pub name: String,
     pub usage_percent: f32,
     pub cores: Vec<CpuCore>,
 }

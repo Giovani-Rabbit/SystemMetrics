@@ -27,6 +27,7 @@ impl SystemMonitor for SysinfoMetrics {
             .collect();
 
         CpuInfo {
+            name: self.sys.cpus()[0].brand().to_string(),
             usage_percent: self.sys.global_cpu_usage(),
             cores,
         }

@@ -62,10 +62,10 @@ fn cpu_block(frame: &mut Frame, area: Rect, cpu: CpuInfo) {
     frame.render_widget(title, area);
 
     let text = Text::from(vec![
-        Line::from(format!(" ▪ CPU - {}", cpu.name.bold())),
+        Line::from(format!(" ▪ CPU - {}", &cpu.name.bold())),
         Line::from(vec![
             "CPU usage: ".into(),
-            format!("{:.2}%", cpu.usage_percent).yellow(),
+            format!("{:.2}%", &cpu.usage_percent).yellow(),
         ]),
     ]);
 
@@ -78,9 +78,14 @@ fn cpu_block(frame: &mut Frame, area: Rect, cpu: CpuInfo) {
 fn memory_block(frame: &mut Frame, area: Rect, memory: MemoryInfo) {
     let lines = vec![
         Line::from(vec![
-            "Memory: ".into(),
+            "RAM".into(),
             format!("{}/{} G", bytes_to_g(memory.used), bytes_to_g(memory.total)).yellow(),
         ]),
+        Line::from(vec![
+            "Usage: ".into(),
+            format!("{}/{} G", bytes_to_g(memory.used), bytes_to_g(memory.total)).yellow(),
+        ]),
+        Line::from(vec!["\n".into()]),
         Line::from(vec![
             "Swap: ".into(),
             format!(

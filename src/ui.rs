@@ -2,6 +2,7 @@ use ratatui::{
     Frame,
     layout::{Alignment, Constraint, Layout, Rect},
     style::{Color, Stylize},
+    symbols::block,
     text::{Line, Text},
     widgets::{Block, Padding, Paragraph},
 };
@@ -19,12 +20,11 @@ pub fn render(frame: &mut Frame, sys: &Box<dyn SystemMonitor>) {
 
     let vertical = Layout::vertical([
         Constraint::Length(1),
-        Constraint::Length(10),
-        Constraint::Length(8),
+        Constraint::Length(20),
         Constraint::Length(1),
     ]);
 
-    let [title_area, main_row, bottom_row, status] = inner.layout(&vertical);
+    let [title_area, main_row, status] = inner.layout(&vertical);
 
     let [cpu_area, mem_area] =
         Layout::horizontal([Constraint::Percentage(60), Constraint::Percentage(40)])
@@ -58,21 +58,44 @@ fn centered_rect(max_width: u16, max_height: u16, area: Rect) -> Rect {
 }
 
 fn cpu_block(frame: &mut Frame, area: Rect, cpu: CpuInfo) {
-    let title = Text::from(vec![Line::from(vec!["CPU".into()])]);
-    frame.render_widget(title, area);
+    let outer_block = Block::bordered().title("CPU");
+    let inner_area = outer_block.inner(area);
+    frame.render_widget(outer_block, area);
 
-    let text = Text::from(vec![
-        Line::from(format!(" ▪ CPU - {}", &cpu.name.bold())),
+    let [top_area, bottom_area] =
+        Layout::vertical([Constraint::Percentage(20), Constraint::Percentage(80)])
+            .areas(inner_area);
+    let [left_area, right_area] =
+        Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
+            .areas(bottom_area);
+
+    let lines = Text::from(vec![
+        Line::from(vec![" ▪ ".into(), cpu.name.bold()]),
         Line::from(vec![
             "CPU usage: ".into(),
-            format!("{:.2}%", &cpu.usage_percent).yellow(),
+            format!(
+                "{:.2}% core amount - {}",
+                cpu.usage_percent,
+                cpu.cores.len()
+            )
+            .yellow()
+            .into(),
         ]),
     ]);
+    frame.render_widget(Paragraph::new(lines), top_area);
 
-    let block = Block::bordered();
-    let p = Paragraph::new(text).block(block);
+    let cores_lines: Vec<Line> = cpu
+        .cores
+        .iter()
+        .enumerate()
+        .map(|(i, c)| Line::from(format!("core {} - {:.2}%", i + 1, c.usage)))
+        .collect();
 
-    frame.render_widget(p, area);
+    let mid = cores_lines.len() / 2;
+    let (left_cores, right_cores) = cores_lines.split_at(mid);
+
+    frame.render_widget(Paragraph::new(Text::from(left_cores.to_vec())), left_area);
+    frame.render_widget(Paragraph::new(Text::from(right_cores.to_vec())), right_area);
 }
 
 fn memory_block(frame: &mut Frame, area: Rect, memory: MemoryInfo) {

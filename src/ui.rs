@@ -15,16 +15,11 @@ pub fn render(frame: &mut Frame, sys: &Box<dyn SystemMonitor>) {
     let cpu = sys.cpu_info();
     let mem = sys.memory_info();
 
-    // calcula alturas reais
-    let cpu_height = 2 + (cpu.cores.len() / 2) as u16; // header + cores em 2 colunas
-    let mem_height = 4u16; // quantidade de linhas do memory_block
+    let cpu_height = 2 + (cpu.cores.len() / 2) as u16;
+    let mem_height = 4u16;
 
-    let main_height = cpu_height.max(mem_height); // o maior dos dois define a linha
-
-    let total_height = 1          // título
-        + main_height
-        + 1                       // status
-        + 2; // borda externa (top + bottom)
+    let main_height = cpu_height.max(mem_height);
+    let total_height = 1 + main_height + 1 + 2;
 
     let constrained = centered_rect(120, total_height, frame.area());
     let outer = Block::bordered();
@@ -81,10 +76,7 @@ fn cpu_block(frame: &mut Frame, area: Rect, cpu: CpuInfo) {
     let inner_area = outer_block.inner(area);
     frame.render_widget(outer_block, area);
 
-    // linhas fixas do topo
     let header_lines = 2u16;
-
-    // cores divididos em duas colunas
     let cores_lines: Vec<Line> = cpu
         .cores
         .iter()
@@ -95,7 +87,6 @@ fn cpu_block(frame: &mut Frame, area: Rect, cpu: CpuInfo) {
     let mid = cores_lines.len() / 2;
     let (left_cores, right_cores) = cores_lines.split_at(mid);
 
-    // altura da seção de cores = metade dos cores (pois ficam lado a lado)
     let cores_height = mid as u16;
 
     let [top_area, bottom_area] = Layout::vertical([
@@ -112,11 +103,10 @@ fn cpu_block(frame: &mut Frame, area: Rect, cpu: CpuInfo) {
         Line::from(vec![" ▪ ".into(), cpu.name.bold()]),
         Line::from(vec![
             "CPU usage: ".into(),
-            format!("{:.2}%  cores - {}", cpu.usage_percent, cpu.cores.len())
-                .yellow()
-                .into(),
+            format!("{:.2}%", cpu.usage_percent).yellow().into(),
         ]),
     ]);
+
     frame.render_widget(Paragraph::new(lines), top_area);
     frame.render_widget(Paragraph::new(Text::from(left_cores.to_vec())), left_area);
     frame.render_widget(Paragraph::new(Text::from(right_cores.to_vec())), right_area);
@@ -125,14 +115,9 @@ fn cpu_block(frame: &mut Frame, area: Rect, cpu: CpuInfo) {
 fn memory_block(frame: &mut Frame, area: Rect, memory: MemoryInfo) {
     let lines = vec![
         Line::from(vec![
-            "RAM".into(),
-            format!("{}/{} G", bytes_to_g(memory.used), bytes_to_g(memory.total)).yellow(),
-        ]),
-        Line::from(vec![
             "Usage: ".into(),
             format!("{}/{} G", bytes_to_g(memory.used), bytes_to_g(memory.total)).yellow(),
         ]),
-        Line::from(vec!["\n".into()]),
         Line::from(vec![
             "Swap: ".into(),
             format!(
@@ -146,7 +131,7 @@ fn memory_block(frame: &mut Frame, area: Rect, memory: MemoryInfo) {
         ]),
     ];
 
-    let block = Block::bordered();
+    let block = Block::bordered().title(" RAM ");
     let p = Paragraph::new(Text::from(lines)).block(block);
     frame.render_widget(p, area);
 }
